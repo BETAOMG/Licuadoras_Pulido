@@ -19,43 +19,7 @@
                 <h2 class="txtMainI">Factura #{{ factura.id }}</h2>
                 <form method="POST">
                     {% csrf_token %}
-                    {% if factura.tipofactura != "Servicios" %}
-                        {% if factura.tipofactura != "Compra" %}
-                            <div id="div_id_usuario" class="mb-3">
-                                <label for="id_usuario" class="form-label requiredField">
-                                *- Ventas <span class="asteriskField">-*</span>
-                                </label>
-                                <select name="usuario" class="select form-select select2" id="id_usuario">
-                                    <option selected>
-                                        --- Seleccione un cliente ---
-                                    </option>
-                                    {% for items in usuario %}
-                                        <option value="{{ items.Uid }}">
-                                            {{ items.Unombre }}
-                                        </option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <button class="btn btn-primary" name="form-user">Seleccionar usuario</button>
-                        {% else %}
-                            <div id="div_id_usuario" class="mb-3">
-                                <label for="id_usuario" class="form-label requiredField">
-                                *- Compras <span class="asteriskField">-*</span>
-                                </label>
-                                <select name="usuario" class="select form-select select2" id="id_usuario">
-                                    <option selected>
-                                        --- Seleccione un proveedor ---
-                                    </option>
-                                    {% for items in usuario %}
-                                        <option value="{{ items.Uid }}">
-                                            {{ items.Unombre }}
-                                        </option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <button class="btn btn-primary" name="form-user">Seleccionar usuario</button>
-                        {% endif %}
-                    {% else %}
+                    {% if factura.tipofactura == "Servicios" %}
                         <div id="div_id_servicio" class="mb-3">
                             <label for="id_servicio" class="form-label requiredField">
                                 *- Servicios <span class="asteriskField">-*</span>
@@ -80,7 +44,7 @@
                 </form>
             {% endif %}
         </div>
-        {% if factura.usuario %}
+        {% if factura.servicio %}
             <div class="row p-1">
                 <div class="col-md-4">
                     <div class="border bg-white p-3">
@@ -89,7 +53,7 @@
                         <form action="" method="POST">
                             {% csrf_token %}
                             {{ form|crispy }}
-                            <button class="btn btn-success btn-block " name="form-detalle">Agregar Factura</button>
+                            <button class="btn btn-success btn-block " name="form-detalle-servicio">Agregar Factura</button>
                             <a class="btn btn-danger btn-block text-light"
                                 href="{% url 'factura-estado' pk=factura.id estado='cerrar' %}">Cerrar Factura</a>
                         </form>
@@ -99,20 +63,20 @@
                     <table class="table bg-white table-bordered results dataTable no-footer dtr-inline" id="proyectos">
                         <thead class="bg-info">
                             <tr class="text-white">
-                                <th scope="col">Producto</th>
+                                <th scope="col">Servicio</th>
+                                <th scope="col">Accesorios</th>
                                 <th scope="col">Cantidad</th>
+                                <th scope="col">Costo</th>
                                 <th scope="col">Estado</th>
-                                <th scope="col">Precio</th>
-                                <th scope="col">Opciones</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for detalle in detalles %}
+                            {% for detalleservicios in detallesservicios %}
                                 <tr>
-                                    <td class="dtr-control sorting_1">{{ detalle.elemento.nombre }}</td>
-                                    <td class="dt-body-right dtr-hidden">{{ detalle.cantidad }}</td>
-                                    <td class="dt-body-right dtr-hidden">{{ detalle.estado }}</td>
-                                    <td class="dt-body-right dtr-hidden">${{ detalle.elemento.precio }}</td>
+                                    <td class="dtr-control sorting_1">{{ detalleservicios.servicio.nombre }}</td>
+                                    <td class="dt-body-right dtr-hidden">{{ detalleservicios.elemento }}</td>
+                                    <td class="dt-body-right dtr-hidden">{{ detalleservicios.cantidad }}</td>
+                                    <td class="dt-body-right dtr-hidden">${{ detalleservicios.costo }}</td>
                                     <td>
                                         <a class="btn btn-danger btn-sm col-3"
                                             href="{% url 'detalle-estado-eliminar' detalle.id %}">

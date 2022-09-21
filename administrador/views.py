@@ -10,6 +10,7 @@ from django.contrib import messages
 
 import os
 from datetime import date
+from usuarios.models import Usuario
 
 @login_required(login_url="usuario-login")
 
@@ -94,8 +95,8 @@ def tipoelemento_eliminar(request,pk):
     return render(request, "administrador/categoria/categoria-eliminar.html", context)
 
 def elemento(request):
-    titulo_pagina='Elementos'
-    elementos= Elemento.objects.all()
+    titulo_pagina='Elemento'
+    elementos= Elemento.objects.all().filter(estado = 'Activo')
     if request.method == 'POST':
         form= ElementoForm(request.POST, request.FILES)
         if form.is_valid():
@@ -253,13 +254,23 @@ def marca_eliminar(request,pk):
 
 def electrodomestico(request):
     titulo_pagina='Electrodomesticos'
-    electrodomesticos= Electrodomestico.objects.all.update()
+    electrodomesticos= Electrodomestico.objects.all()
+    form = ElectrodomesticoForm()
     if request.method == 'POST':
         form= ElectrodomesticoForm(request.POST)
+        
         if form.is_valid():
             form.save()
             electrodomestico_nombre= form.cleaned_data.get('nombre')
-            messages.success(request,f'El electrodomestico {electrodomestico_nombre} se agregó correctamente!'.update)
+            messages.success(request,f'El electrodomestico {electrodomestico_nombre} se agregó correctamente!')
+            # insumo = form.cleaned_data('electrodomestico')
+            # if insumo.estado != 'Activo':
+            #     messages.success(request,'xd')
+            # else:
+            #     electrodomestico_nombre= form.cleaned_data.get('nombre')
+            #     messages.success(request,f'El electrodomestico {electrodomestico_nombre} se agregó correctamente!')
+            #     s =form.save()
+            #     s.save()
         else:
             messages.error(request,f'Error al registrar el electrodomestico ¡Por favor verificar los datos!  ')    
             return redirect('administrador-electrodomestico')
@@ -326,14 +337,23 @@ def electrodomestico_eliminar(request,pk):
 
 def servicio(request):
     titulo_pagina="Servicios"
+    # usuarios = Usuario.objects.filter(usuario=Cliente)
+    usuarios = Usuario.objects.filter(estado="Activo")
+    items = Electrodomestico.objects.filter(estado = "Activo")
     servicios= Servicio.objects.all()
     if request.method == 'POST':
         form= ServicioForm(request.POST)
         if form.is_valid():
-            form.save()
+            aux= Servicio.objects.create(
+            tiposervicio= request.POST['tiposervicio'],
+            observacion= request.POST['observacion'],
+            fallas_basicas= request.POST['fallas_basicas'],
+            diagnostico= request.POST['diagnostico'],
+            electrodomestico= Electrodomestico.objects.get(id= request.POST['electrodomestico']),
+            usuario= Usuario.objects.get(Uid= request.POST['usuario']),
+            )
             servicio_electrodomestico= form.cleaned_data.get('electrodomestico')
-            messages.success(request,f'El servicio {servicio_electrodomestico} se agregó correctamente!')
-            
+            messages.success(request,f'El servicio {servicio_electrodomestico} se agregó correctamente!')           
         else:
             messages.error(request,f'Error al registrar el servicio ¡Por favor verificar los datos!  ')    
             return redirect('administrador-servicio')
@@ -342,7 +362,9 @@ def servicio(request):
     context={
             "titulo_pagina": titulo_pagina,
             "servicios":servicios,
-            "form": form 
+            "form": form ,
+            "usuario": usuarios,
+            "item": items
     }
     return render(request, "administrador/servicio/servicio.html",context)
 
