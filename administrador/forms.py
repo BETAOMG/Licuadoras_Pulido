@@ -48,7 +48,6 @@ class ElectrodomesticoForm(ModelForm):
     class Meta:
         model= Electrodomestico
         fields=['nombre', 'marca', 'referencia']
-        
 
 class ElectrodomesticoEditarForm(ModelForm):
     class Meta:
@@ -58,7 +57,7 @@ class ElectrodomesticoEditarForm(ModelForm):
 class ServicioForm(ModelForm):
     class Meta:
         model= Servicio
-        fields=['tiposervicio','observacion', 'fallas_basicas', 'diagnostico']
+        fields=['usuario','tiposervicio', 'electrodomestico','observacion', 'fallas_basicas', 'diagnostico']
         widgets = {
             'observacion': Textarea(attrs={'cols': 50, 'rows': 5}),
         }
